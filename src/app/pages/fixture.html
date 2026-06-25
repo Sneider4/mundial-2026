@@ -1,0 +1,92 @@
+<div class="container-xl px-4 py-5">
+
+    <div class="d-flex align-items-center justify-content-between mb-5 flex-wrap gap-3">
+        <h1 class="section-title">Fixture</h1>
+        <div class="d-flex gap-2 flex-wrap">
+            @for (f of filtros; track f) {
+                <button class="pill" [class.active]="filtro() === f" (click)="setFiltro(f)">
+                    {{ labelFiltro(f) }}
+                    @if (f !== 'TODOS') {
+                        <span style="font-size:.6rem;opacity:.7">({{ countFiltro(f) }})</span>
+                    }
+                </button>
+            }
+        </div>
+    </div>
+
+    @if (loading()) {
+        <div style="color:var(--text-3)">Cargando...</div>
+    } @else {
+        @for (grupo of porFecha(); track grupo.fecha) {
+            <div class="mb-4">
+                <p class="section-label mb-3">{{ grupo.fecha | date:'EEEE, d \'de\' MMMM' }}</p>
+                <div class="glass overflow-hidden">
+                    @for (m of grupo.partidos; track m.id; let last = $last) {
+                        <div class="fixture-row" [style.border-bottom]="last ? 'none' : '1px solid var(--border)'">
+
+                            <span class="fx-time">{{ m.utcDate | date:'HH:mm' }}</span>
+
+                            <div class="fx-team right">
+                                <span>{{ m.homeTeam?.shortName }}</span>
+                                <img [src]="flagUrl(m.homeTeam)" class="flag" [alt]="m.homeTeam?.shortName">
+                            </div>
+
+                            <div class="fx-score">
+                                @if (m.status === 'FINISHED' || m.status === 'IN_PLAY' || m.status === 'LIVE') {
+                                    <span>{{ scoreLocal(m) }}</span>
+                                    <span class="fx-sep">—</span>
+                                    <span>{{ scoreVisita(m) }}</span>
+                                } @else {
+                                    <span class="fx-vs">vs</span>
+                                }
+                            </div>
+
+                            <div class="fx-team left">
+                                <img [src]="flagUrl(m.awayTeam)" class="flag" [alt]="m.awayTeam?.shortName">
+                                <span>{{ m.awayTeam?.shortName }}</span>
+                            </div>
+
+                            <div class="fx-meta">
+                                @if (m.status === 'FINISHED') {
+                                    <span class="status-badge finished">FIN</span>
+                                } @else if (m.status === 'LIVE' || m.status === 'IN_PLAY') {
+                                    <span class="live-dot">Live</span>
+                                } @else {
+                                    <span class="status-badge scheduled">Prog.</span>
+                                }
+                                <span style="font-size:.6rem;color:var(--text-3)">{{ m.group ?? '' }}</span>
+                            </div>
+
+                        </div>
+                    }
+                </div>
+            </div>
+        }
+        @if (porFecha().length === 0) {
+            <div class="glass p-5 text-center" style="color:var(--text-2)">Sin partidos en este filtro.</div>
+        }
+    }
+</div>
+
+<style>
+.fixture-row {
+    display:flex; align-items:center; gap:16px;
+    padding:11px 16px; transition:background .15s;
+}
+.fixture-row:hover { background:var(--surface-2); }
+
+.fx-time { font-size:.7rem; color:var(--text-3); min-width:40px; }
+.fx-team { display:flex; align-items:center; gap:8px; flex:1; }
+.fx-team.right { justify-content:flex-end; }
+.fx-team span { font-size:.83rem; font-weight:500; }
+
+.fx-score {
+    font-family:'Space Grotesk',sans-serif; font-weight:700;
+    font-size:1.05rem; color:#fff;
+    min-width:76px; text-align:center;
+    display:flex; align-items:center; justify-content:center;
+}
+.fx-sep { color:rgba(255,255,255,.2); font-size:.85rem; margin:0 5px; }
+.fx-vs { font-size:.72rem; color:var(--text-3); font-weight:400; }
+.fx-meta { display:flex; flex-direction:column; align-items:flex-end; gap:3px; min-width:56px; }
+</style>

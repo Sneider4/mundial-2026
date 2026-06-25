@@ -1,0 +1,82 @@
+<div class="container-xl px-4 py-5">
+    <div class="d-flex align-items-end gap-3 mb-5">
+        <h1 class="section-title">Eliminatorias</h1>
+        <span style="font-size:.78rem;color:var(--text-2);margin-bottom:3px">FIFA World Cup 2026</span>
+    </div>
+
+    @if (loading()) {
+        <div style="color:var(--text-3)">Cargando...</div>
+    } @else if (porFase().length === 0) {
+        <div class="glass p-5 text-center">
+            <div style="font-size:3rem;opacity:.15;margin-bottom:1rem">⬡</div>
+            <p style="color:var(--text-2);margin:0;font-size:.9rem">
+                La fase eliminatoria aún no ha comenzado.<br>
+                <span style="color:var(--text-3);font-size:.8rem">Vuelve cuando terminen los grupos.</span>
+            </p>
+        </div>
+    } @else {
+        @for (fase of porFase(); track fase.key) {
+            <div class="mb-5">
+                <p class="section-label mb-3">{{ fase.label }}</p>
+                <div class="row g-3">
+                    @for (m of fase.partidos; track m.id) {
+                        <div class="col-md-6 col-lg-4 col-xl-3">
+                            <div class="glass overflow-hidden bracket-card">
+
+                                @if (m.status === 'SCHEDULED') {
+                                    <div class="bracket-date">{{ m.utcDate | date:'d MMM · HH:mm' }}</div>
+                                }
+
+                                <div class="bracket-team" [class.winner]="ganador(m) === m.homeTeam?.id">
+                                    <img [src]="flagUrl(m.homeTeam)" class="flag" [alt]="m.homeTeam?.shortName">
+                                    <span class="bracket-name">{{ m.homeTeam?.shortName ?? 'Por definir' }}</span>
+                                    @if (m.status === 'FINISHED') {
+                                        <span class="bracket-score">{{ scoreL(m) }}</span>
+                                    }
+                                </div>
+
+                                <div class="bracket-divider"></div>
+
+                                <div class="bracket-team" [class.winner]="ganador(m) === m.awayTeam?.id">
+                                    <img [src]="flagUrl(m.awayTeam)" class="flag" [alt]="m.awayTeam?.shortName">
+                                    <span class="bracket-name">{{ m.awayTeam?.shortName ?? 'Por definir' }}</span>
+                                    @if (m.status === 'FINISHED') {
+                                        <span class="bracket-score">{{ scoreV(m) }}</span>
+                                    }
+                                </div>
+
+                            </div>
+                        </div>
+                    }
+                </div>
+            </div>
+        }
+    }
+</div>
+
+<style>
+.bracket-card { border-radius: 10px; }
+
+.bracket-date {
+    font-size:.65rem; color:var(--text-3);
+    text-align:center; padding:7px 12px;
+    border-bottom:1px solid var(--border);
+    letter-spacing:.04em;
+}
+
+.bracket-team {
+    display:flex; align-items:center; gap:10px;
+    padding:11px 14px; transition:background .15s;
+}
+.bracket-team.winner { background:rgba(201,168,76,.06); }
+.bracket-team.winner .bracket-name { color:var(--gold); }
+.bracket-team.winner .bracket-score { color:var(--gold); }
+
+.bracket-name { flex:1; font-size:.85rem; font-weight:500; color:var(--text); }
+.bracket-score {
+    font-family:'Space Grotesk',sans-serif;
+    font-size:1.1rem; font-weight:700; color:var(--text-2);
+}
+
+.bracket-divider { height:1px; background:var(--border); margin:0 14px; }
+</style>

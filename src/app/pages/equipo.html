@@ -1,0 +1,109 @@
+<div class="container-xl px-4 py-5">
+
+    <a routerLink="/grupos"
+       style="font-size:.78rem;color:var(--text-3);text-decoration:none;
+              display:inline-flex;align-items:center;gap:6px;margin-bottom:28px">
+        ← Volver a grupos
+    </a>
+
+    @if (loading()) {
+        <div style="color:var(--text-3)">Cargando equipo...</div>
+    } @else if (equipo()) {
+
+        <!-- Header -->
+        <div class="glass p-4 mb-5 equipo-header">
+            <img [src]="equipo().crest" [alt]="equipo().name" class="equipo-crest">
+            <div>
+                <h1 style="font-family:'Space Grotesk',sans-serif;font-size:1.8rem;font-weight:700;color:#fff;margin:0 0 8px">
+                    {{ equipo().name }}
+                </h1>
+                <div class="d-flex gap-4 flex-wrap" style="color:var(--text-2);font-size:.8rem">
+                    <span>{{ equipo().area?.name }}</span>
+                    @if (equipo().founded) {
+                        <span style="color:var(--text-3)">Fundado en {{ equipo().founded }}</span>
+                    }
+                </div>
+            </div>
+        </div>
+
+        <!-- Partidos -->
+        <p class="section-label mb-3">Partidos en el Mundial</p>
+
+        @if (partidos().length === 0) {
+            <div class="glass p-4 text-center" style="color:var(--text-2)">Sin partidos registrados.</div>
+        } @else {
+            <div class="glass overflow-hidden">
+                @for (m of partidos(); track m.id; let last = $last) {
+                    @let res = resultado(m);
+                    <div class="eq-row" [style.border-bottom]="last ? 'none' : '1px solid var(--border)'">
+
+                        <span class="eq-date">{{ m.utcDate | date:'d MMM' }}</span>
+
+                        @if (res) {
+                            <span class="eq-res" [style.color]="colorRes(res)">{{ res }}</span>
+                        } @else {
+                            <span class="eq-res" style="color:var(--text-3)">—</span>
+                        }
+
+                        <div class="eq-team right">
+                            <span [style.opacity]="m.homeTeam?.id === equipo()?.id ? 1 : 0.45">
+                                {{ m.homeTeam?.shortName }}
+                            </span>
+                            <img [src]="flagUrl(m.homeTeam)" class="flag" [alt]="m.homeTeam?.shortName">
+                        </div>
+
+                        <div class="eq-score">
+                            @if (m.status === 'FINISHED') {
+                                <span>{{ scoreL(m) }}</span>
+                                <span style="color:rgba(255,255,255,.2);font-size:.8rem;margin:0 4px">—</span>
+                                <span>{{ scoreV(m) }}</span>
+                            } @else {
+                                <span style="font-size:.72rem;color:var(--text-3)">vs</span>
+                            }
+                        </div>
+
+                        <div class="eq-team left">
+                            <img [src]="flagUrl(m.awayTeam)" class="flag" [alt]="m.awayTeam?.shortName">
+                            <span [style.opacity]="m.awayTeam?.id === equipo()?.id ? 1 : 0.45">
+                                {{ m.awayTeam?.shortName }}
+                            </span>
+                        </div>
+
+                        <span class="eq-stage">{{ m.group ?? m.stage }}</span>
+                    </div>
+                }
+            </div>
+        }
+    }
+</div>
+
+<style>
+.equipo-header {
+    display:flex; align-items:center; gap:24px; border-radius:12px;
+}
+.equipo-crest {
+    width:72px; height:72px; object-fit:contain;
+    filter:drop-shadow(0 0 12px rgba(201,168,76,.2));
+    flex-shrink:0;
+}
+
+.eq-row {
+    display:flex; align-items:center; gap:14px;
+    padding:11px 16px; transition:background .15s;
+}
+.eq-row:hover { background:var(--surface-2); }
+
+.eq-date { font-size:.68rem; color:var(--text-3); min-width:42px; }
+.eq-res  { font-size:.72rem; font-weight:700; min-width:16px; text-align:center; }
+
+.eq-team { display:flex; align-items:center; gap:8px; flex:1; }
+.eq-team.right { justify-content:flex-end; }
+.eq-team span { font-size:.83rem; font-weight:500; }
+
+.eq-score {
+    font-family:'Space Grotesk',sans-serif; font-weight:700; font-size:1rem;
+    color:#fff; min-width:72px; text-align:center;
+    display:flex; align-items:center; justify-content:center;
+}
+.eq-stage { font-size:.62rem; color:var(--text-3); min-width:48px; text-align:right; }
+</style>

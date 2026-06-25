@@ -1,0 +1,157 @@
+<div class="container-xl px-4 py-5">
+
+    <!-- EN VIVO -->
+    @if (enVivo().length > 0) {
+        <div class="mb-6">
+            <p class="section-label mb-3"><span class="live-dot">En vivo</span></p>
+            <div class="row g-3">
+                @for (m of enVivo(); track m.id) {
+                    <div class="col-md-6 col-xl-4">
+                        <div class="glass p-4" style="border-color:rgba(224,82,82,.25)">
+                            <div class="d-flex justify-content-between align-items-center mb-3">
+                                <span class="text-3" style="font-size:.7rem">{{ m.group ?? m.stage }}</span>
+                                <span class="live-dot">Live</span>
+                            </div>
+                            <div class="d-flex align-items-center justify-content-between">
+                                <div class="text-center" style="flex:1">
+                                    <img [src]="flagUrl(m.homeTeam)" class="flag-lg mb-2" [alt]="m.homeTeam?.shortName">
+                                    <div style="font-size:.8rem;font-weight:600">{{ m.homeTeam?.shortName }}</div>
+                                </div>
+                                <div class="text-center px-4">
+                                    <div class="score-num" style="font-size:2.4rem">{{ scoreLocal(m) }}<span style="color:rgba(255,255,255,.2);margin:0 4px">—</span>{{ scoreVisitante(m) }}</div>
+                                </div>
+                                <div class="text-center" style="flex:1">
+                                    <img [src]="flagUrl(m.awayTeam)" class="flag-lg mb-2" [alt]="m.awayTeam?.shortName">
+                                    <div style="font-size:.8rem;font-weight:600">{{ m.awayTeam?.shortName }}</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                }
+            </div>
+        </div>
+    }
+
+    <div class="row g-5">
+
+        <!-- RESULTADOS -->
+        <div class="col-lg-7">
+            <p class="section-label mb-4">Últimos resultados</p>
+
+            @if (loading()) {
+                <div style="color:var(--text-3)">Cargando...</div>
+            } @else if (recientes().length === 0) {
+                <div class="glass p-5 text-center" style="color:var(--text-2)">
+                    Aún no se han jugado partidos.
+                </div>
+            } @else {
+                <div class="d-flex flex-column" style="gap:2px">
+                    @for (m of recientes(); track m.id) {
+                        <div class="match-row glass">
+                            <span class="match-date">{{ m.utcDate | date:'d MMM' }}</span>
+
+                            <div class="match-team right">
+                                <span>{{ m.homeTeam?.shortName }}</span>
+                                <img [src]="flagUrl(m.homeTeam)" class="flag" [alt]="m.homeTeam?.shortName">
+                            </div>
+
+                            <div class="match-score">
+                                <span>{{ scoreLocal(m) }}</span>
+                                <span style="color:var(--text-3);font-size:.8rem;margin:0 4px">—</span>
+                                <span>{{ scoreVisitante(m) }}</span>
+                            </div>
+
+                            <div class="match-team left">
+                                <img [src]="flagUrl(m.awayTeam)" class="flag" [alt]="m.awayTeam?.shortName">
+                                <span>{{ m.awayTeam?.shortName }}</span>
+                            </div>
+
+                            <span class="match-group">{{ m.group ?? '' }}</span>
+                        </div>
+                    }
+                </div>
+                <a routerLink="/fixture" style="font-size:.78rem;color:var(--gold);text-decoration:none;display:inline-flex;align-items:center;gap:4px;margin-top:16px">
+                    Ver fixture completo <span>→</span>
+                </a>
+            }
+        </div>
+
+        <!-- PRÓXIMOS + GOLEADORES -->
+        <div class="col-lg-5 d-flex flex-column gap-5">
+
+            <!-- Próximos -->
+            <div>
+                <p class="section-label mb-4">Próximos partidos</p>
+                <div class="d-flex flex-column" style="gap:2px">
+                    @for (m of proximos().slice(0,5); track m.id) {
+                        <div class="glass px-3 py-2" style="border-radius:8px">
+                            <div style="font-size:.62rem;color:var(--text-3);margin-bottom:4px">{{ m.utcDate | date:'EEE d MMM · HH:mm' }}</div>
+                            <div class="d-flex align-items-center gap-2">
+                                <img [src]="flagUrl(m.homeTeam)" class="flag">
+                                <span style="font-size:.83rem;font-weight:500;flex:1">{{ m.homeTeam?.shortName }}</span>
+                                <span style="font-size:.7rem;color:var(--text-3)">vs</span>
+                                <span style="font-size:.83rem;font-weight:500;flex:1;text-align:right">{{ m.awayTeam?.shortName }}</span>
+                                <img [src]="flagUrl(m.awayTeam)" class="flag">
+                            </div>
+                        </div>
+                    }
+                </div>
+            </div>
+
+            <!-- Goleadores -->
+            @if (goleadores().length > 0) {
+                <div>
+                    <p class="section-label mb-4">Tabla de goleadores</p>
+                    <div class="glass overflow-hidden">
+                        @for (g of goleadores(); track $index) {
+                            <div class="scorer-row" [class.first]="$index === 0">
+                                <span class="scorer-pos">{{ $index + 1 }}</span>
+                                <img [src]="flagUrl(g.team)" class="flag">
+                                <div style="flex:1;min-width:0">
+                                    <div style="font-size:.83rem;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">{{ g.player?.name }}</div>
+                                    <div style="font-size:.68rem;color:var(--text-2)">{{ g.team?.shortName }}</div>
+                                </div>
+                                <div class="scorer-goals">{{ g.goals }}</div>
+                            </div>
+                        }
+                    </div>
+                </div>
+            }
+
+        </div>
+    </div>
+</div>
+
+<style>
+.mb-6 { margin-bottom: 3rem; }
+
+.match-row {
+    display: flex; align-items: center; gap: 12px;
+    padding: 10px 14px; border-radius: 8px;
+}
+.match-row:hover { background: var(--surface-2); }
+.match-date { font-size:.68rem; color:var(--text-3); min-width:42px; }
+.match-team { display:flex; align-items:center; gap:8px; flex:1; }
+.match-team.right { justify-content:flex-end; }
+.match-team span { font-size:.83rem; font-weight:500; }
+.match-score {
+    font-family:'Space Grotesk',sans-serif; font-weight:700; font-size:1rem;
+    color:#fff; min-width:72px; text-align:center;
+    display:flex; align-items:center; justify-content:center;
+}
+.match-group { font-size:.62rem; color:var(--text-3); min-width:40px; text-align:right; }
+
+.scorer-row {
+    display:flex; align-items:center; gap:12px;
+    padding:10px 14px; border-bottom:1px solid var(--border);
+    transition: background .15s;
+}
+.scorer-row:hover { background:var(--surface-2); }
+.scorer-row:last-child { border-bottom:none; }
+.scorer-row.first .scorer-goals { color:#c9a84c; }
+.scorer-pos { font-size:.7rem; color:var(--text-3); min-width:16px; }
+.scorer-goals {
+    font-family:'Space Grotesk',sans-serif;
+    font-size:1.3rem; font-weight:700; color:#fff;
+}
+</style>
