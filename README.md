@@ -1,10 +1,10 @@
 # Mundial 2026 ⬡
 
-Plataforma de visualización en tiempo real del **FIFA World Cup 2026** (USA · CAN · MEX) construida con Angular 21 y la API oficial de football-data.org.
+Dashboard de visualización en tiempo real del **FIFA World Cup 2026** (USA · CAN · MEX) construido con Angular 21, Chart.js y la API oficial de football-data.org.
 
-Diseño futurista minimalista con paleta oscura y acentos dorados.
+Diseño dark premium con paleta oscura y acentos dorados.
 
-> **Demo en vivo:** [mundial-2026.vercel.app](https://mundial-2026.vercel.app)
+> **Demo en vivo:** [mundial-2026-gold.vercel.app](https://mundial-2026-gold.vercel.app)
 
 ---
 
@@ -12,7 +12,8 @@ Diseño futurista minimalista con paleta oscura y acentos dorados.
 
 | Sección | Descripción |
 |---|---|
-| **Inicio** | Partidos en vivo, últimos resultados, próximos partidos y tabla de goleadores |
+| **Inicio** | KPI cards (partidos totales, goles, promedio, goleador), últimos resultados, próximos partidos y gráfica de top goleadores |
+| **Estadísticas** | Mejores ataques, mejores defensas, distribución de resultados (donut), goles por grupo, tabla de goleadores y resumen de los 48 equipos |
 | **Grupos** | Tabla de posiciones por grupo con indicador de clasificados |
 | **Fixture** | Todos los partidos filtrables por estado (Finalizados / En vivo / Programados), agrupados por fecha |
 | **Eliminatorias** | Bracket por fase (Octavos → Final) con ganador resaltado |
@@ -21,10 +22,11 @@ Diseño futurista minimalista con paleta oscura y acentos dorados.
 ## Stack
 
 - **Angular 21** — Standalone components, Signals, new control flow (`@if`, `@for`)
+- **Chart.js** — BarChart, DoughnutChart (imports selectivos para bundle óptimo)
 - **Bootstrap 5** + Bootstrap Icons
 - **football-data.org** API (competición `WC`)
 - CSS glassmorphism, fuentes Inter + Space Grotesk, paleta `#07090d` / `#c9a84c`
-- **Vercel** — despliegue con función serverless para el proxy de la API
+- **Vercel** — función serverless `api/football.js` como proxy de la API
 
 ---
 
@@ -42,17 +44,20 @@ npm install
 
 Obtén una API key gratuita en [football-data.org](https://www.football-data.org/client/register).
 
-Copia el archivo de ejemplo del proxy:
+Crea el archivo `proxy.conf.json` en la raíz del proyecto:
 
-```bash
-# Linux / Mac
-cp proxy.conf.example.json proxy.conf.json
-
-# Windows (PowerShell)
-Copy-Item proxy.conf.example.json proxy.conf.json
+```json
+{
+    "/football-api": {
+        "target": "https://api.football-data.org",
+        "changeOrigin": true,
+        "pathRewrite": { "^/football-api": "" },
+        "headers": { "X-Auth-Token": "TU_API_KEY_AQUI" }
+    }
+}
 ```
 
-Edita `proxy.conf.json` y reemplaza `TU_API_KEY_AQUI` con tu key real.
+> Este archivo está en `.gitignore` — nunca se sube al repositorio.
 
 ### 3. Levantar el servidor
 
@@ -92,9 +97,10 @@ En **Settings → Environment Variables** añade:
 Vercel detecta automáticamente el `vercel.json` y:
 - Ejecuta `npm run build` (Angular build de producción)
 - Sirve los estáticos desde `dist/mundial-2026/browser/`
-- Expone la función serverless `api/football/[...path].js` como proxy de la API
+- Expone la función serverless `api/football.js` como proxy seguro de la API
+- La rewrite `/football-api/:path*` → `/api/football` enruta las llamadas al proxy
 
 ---
 
 Desarrollado por **Richard Sneider Malagón Conde**  
-[GitHub @Sneider4](https://github.com/Sneider4) · [LinkedIn](https://www.linkedin.com/in/sneider-malagon)
+[GitHub @Sneider4](https://github.com/Sneider4) · [LinkedIn](https://www.linkedin.com/in/sneider-malagon) · [Portafolio](https://sneider4.github.io/portfolio/)
