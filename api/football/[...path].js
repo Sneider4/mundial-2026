@@ -1,4 +1,4 @@
-export default async function handler(req, res) {
+module.exports = async function handler(req, res) {
     const { path = [], ...query } = req.query;
     const pathStr = Array.isArray(path) ? path.join('/') : (path || '');
 
@@ -19,4 +19,4 @@ export default async function handler(req, res) {
     } catch {
         res.status(500).json({ error: 'Proxy error' });
     }
-}
+};
