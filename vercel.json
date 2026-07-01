@@ -2,6 +2,7 @@
     "outputDirectory": "dist/mundial-2026/browser",
     "buildCommand": "npm run build",
     "rewrites": [
-        { "source": "/((?!api/).*)", "destination": "/index.html" }
+        { "source": "/football-api/:path*", "destination": "/api/football?p=:path*" },
+        { "source": "/(.*)", "destination": "/index.html" }
     ]
 }

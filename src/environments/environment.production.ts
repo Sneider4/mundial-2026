@@ -1,5 +1,5 @@
 export const environment = {
     production: true,
-    apiUrl: '/api/football/v4',
+    apiUrl: '/football-api/v4',
     competitionCode: 'WC',
 };

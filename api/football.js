@@ -1,8 +1,7 @@
 module.exports = async function handler(req, res) {
-    const { path = [], ...query } = req.query;
-    const pathStr = Array.isArray(path) ? path.join('/') : (path || '');
-
-    const search = new URLSearchParams(query).toString();
+    const { p, ...rest } = req.query;
+    const pathStr = Array.isArray(p) ? p.join('/') : (p || '');
+    const search = new URLSearchParams(rest).toString();
     const apiUrl = `https://api.football-data.org/${pathStr}${search ? '?' + search : ''}`;
 
     try {
@@ -12,11 +11,10 @@ module.exports = async function handler(req, res) {
                 'Accept': 'application/json',
             },
         });
-
         const data = await response.json();
         res.setHeader('Cache-Control', 's-maxage=30, stale-while-revalidate=60');
         res.status(response.status).json(data);
-    } catch {
-        res.status(500).json({ error: 'Proxy error' });
+    } catch (err) {
+        res.status(500).json({ error: 'Proxy error', detail: err.message });
     }
 };
