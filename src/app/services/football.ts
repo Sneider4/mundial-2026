@@ -18,7 +18,7 @@ export class FootballService {
     }
 
     getStandings()   { return this.http.get<any>(`${BASE}/standings`); }
-    getGoleadores()  { return this.http.get<any>(`${BASE}/scorers?limit=10`); }
+    getGoleadores(limit = 10)  { return this.http.get<any>(`${BASE}/scorers?limit=${limit}`); }
     getEquipos()     { return this.http.get<any>(`${BASE}/teams`); }
 
     getEquipo(id: number) {

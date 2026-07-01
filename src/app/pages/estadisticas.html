@@ -1,0 +1,222 @@
+<div class="container-xl px-4 py-5">
+
+    <!-- Header -->
+    <div class="d-flex align-items-end gap-3 mb-5">
+        <h1 class="section-title">Estadísticas</h1>
+        <span style="font-size:.78rem;color:var(--text-2);margin-bottom:3px">FIFA World Cup 2026</span>
+    </div>
+
+    @if (loading()) {
+        <div style="color:var(--text-3)">Cargando estadísticas...</div>
+    } @else {
+
+        <!-- RESUMEN GENERAL -->
+        <div class="row g-3 mb-5">
+            <div class="col-4">
+                <div class="glass stat-mini">
+                    <div class="stat-mini-val">{{ totalGoles() }}</div>
+                    <div class="stat-mini-lbl">Goles totales</div>
+                </div>
+            </div>
+            <div class="col-4">
+                <div class="glass stat-mini">
+                    <div class="stat-mini-val">{{ totalJugados() }}</div>
+                    <div class="stat-mini-lbl">Partidos jugados</div>
+                </div>
+            </div>
+            <div class="col-4">
+                <div class="glass stat-mini">
+                    <div class="stat-mini-val">{{ promedioGoles() }}</div>
+                    <div class="stat-mini-lbl">Promedio de goles</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- FILA 1: ATAQUES + DEFENSAS -->
+        <div class="row g-4 mb-4">
+            <div class="col-md-6">
+                <div class="glass p-4">
+                    <p class="section-label mb-3">
+                        <i class="bi bi-lightning-charge-fill" style="color:var(--gold)"></i>
+                        Mejores ataques
+                    </p>
+                    <div style="height:320px;position:relative">
+                        <canvas #atacantesChart></canvas>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-6">
+                <div class="glass p-4">
+                    <p class="section-label mb-3">
+                        <i class="bi bi-shield-fill-check" style="color:#60a5fa"></i>
+                        Mejores defensas
+                    </p>
+                    <div style="height:320px;position:relative">
+                        <canvas #defensasChart></canvas>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- FILA 2: DISTRIBUCIÓN RESULTADOS + GOLES POR GRUPO -->
+        <div class="row g-4 mb-5">
+            <div class="col-md-5">
+                <div class="glass p-4 h-100">
+                    <p class="section-label mb-3">
+                        <i class="bi bi-pie-chart-fill" style="color:#a78bfa"></i>
+                        Distribución de resultados
+                    </p>
+                    <div style="height:280px;position:relative">
+                        <canvas #resultChart></canvas>
+                    </div>
+                    <!-- Resumen debajo del donut -->
+                    @let res = resultados();
+                    <div class="d-flex justify-content-around mt-3">
+                        <div class="text-center">
+                            <div style="font-family:'Space Grotesk',sans-serif;font-size:1.1rem;font-weight:700;color:#4ade80">{{ res.local }}</div>
+                            <div style="font-size:.62rem;color:var(--text-3);text-transform:uppercase;letter-spacing:.08em">Local</div>
+                        </div>
+                        <div class="text-center">
+                            <div style="font-family:'Space Grotesk',sans-serif;font-size:1.1rem;font-weight:700;color:var(--gold)">{{ res.empate }}</div>
+                            <div style="font-size:.62rem;color:var(--text-3);text-transform:uppercase;letter-spacing:.08em">Empate</div>
+                        </div>
+                        <div class="text-center">
+                            <div style="font-family:'Space Grotesk',sans-serif;font-size:1.1rem;font-weight:700;color:#60a5fa">{{ res.visitante }}</div>
+                            <div style="font-size:.62rem;color:var(--text-3);text-transform:uppercase;letter-spacing:.08em">Visitante</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-7">
+                <div class="glass p-4 h-100">
+                    <p class="section-label mb-3">
+                        <i class="bi bi-bar-chart-fill" style="color:#4ade80"></i>
+                        Goles por grupo
+                    </p>
+                    <div style="height:320px;position:relative">
+                        <canvas #gruposChart></canvas>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- TABLA COMPLETA DE GOLEADORES -->
+        @if (scorers().length > 0) {
+            <p class="section-label mb-3">
+                <i class="bi bi-trophy-fill" style="color:var(--gold)"></i>
+                Tabla de goleadores
+            </p>
+            <div class="glass overflow-hidden mb-5">
+                <table>
+                    <thead>
+                        <tr>
+                            <th style="padding-left:16px;text-align:left">#</th>
+                            <th style="text-align:left">Jugador</th>
+                            <th style="text-align:left">Selección</th>
+                            <th class="text-center" style="color:var(--gold)">G</th>
+                            <th class="text-center">Ast.</th>
+                            <th class="text-center">Min/G</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @for (s of scorers(); track $index) {
+                            <tr>
+                                <td style="padding-left:16px">
+                                    @if ($index === 0) {
+                                        <i class="bi bi-trophy-fill" style="color:var(--gold);font-size:.8rem"></i>
+                                    } @else {
+                                        <span style="color:var(--text-3);font-size:.72rem">{{ $index + 1 }}</span>
+                                    }
+                                </td>
+                                <td>
+                                    <span style="font-size:.85rem;font-weight:600;color:var(--text)">{{ s.player?.name }}</span>
+                                </td>
+                                <td>
+                                    <div class="d-flex align-items-center gap-2">
+                                        <img [src]="flagUrl(s.team)" class="flag">
+                                        <span style="font-size:.78rem;color:var(--text-2)">{{ s.team?.shortName }}</span>
+                                    </div>
+                                </td>
+                                <td class="text-center">
+                                    <span style="font-family:'Space Grotesk',sans-serif;font-weight:700;font-size:.95rem;color:#fff">
+                                        {{ s.goals ?? 0 }}
+                                    </span>
+                                </td>
+                                <td class="text-center" style="color:var(--text-2);font-size:.82rem">
+                                    {{ s.assists ?? 0 }}
+                                </td>
+                                <td class="text-center" style="color:var(--text-2);font-size:.82rem">
+                                    {{ s.goals > 0 ? ((s.minutesPlayed ?? 0) / s.goals | number:'1.0-0') : '–' }}
+                                </td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+        }
+
+        <!-- TABLA EQUIPOS -->
+        @if (todasSelecciones().length > 0) {
+            <p class="section-label mb-3">
+                <i class="bi bi-people-fill" style="color:#60a5fa"></i>
+                Estadísticas por selección
+            </p>
+            <div class="glass overflow-hidden">
+                <table>
+                    <thead>
+                        <tr>
+                            <th style="padding-left:16px;text-align:left">Selección</th>
+                            <th class="text-center">PJ</th>
+                            <th class="text-center">G</th>
+                            <th class="text-center">E</th>
+                            <th class="text-center">P</th>
+                            <th class="text-center">GF</th>
+                            <th class="text-center">GC</th>
+                            <th class="text-center">DG</th>
+                            <th class="text-center" style="color:var(--gold)">Pts</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @for (t of todasSelecciones(); track t.team.id) {
+                            <tr>
+                                <td style="padding-left:16px">
+                                    <div class="d-flex align-items-center gap-2">
+                                        <img [src]="flagUrl(t.team)" class="flag">
+                                        <span style="font-size:.82rem;font-weight:500">{{ t.team?.shortName }}</span>
+                                    </div>
+                                </td>
+                                <td class="text-center" style="color:var(--text-2)">{{ t.playedGames }}</td>
+                                <td class="text-center" style="color:var(--text-2)">{{ t.won }}</td>
+                                <td class="text-center" style="color:var(--text-2)">{{ t.draw }}</td>
+                                <td class="text-center" style="color:var(--text-2)">{{ t.lost }}</td>
+                                <td class="text-center" style="color:#4ade80;font-weight:600">{{ t.goalsFor }}</td>
+                                <td class="text-center" style="color:#f87171">{{ t.goalsAgainst }}</td>
+                                <td class="text-center" style="color:var(--text-2)">
+                                    {{ t.goalDifference > 0 ? '+' : '' }}{{ t.goalDifference }}
+                                </td>
+                                <td class="text-center" style="font-weight:700;color:#fff;font-family:'Space Grotesk',sans-serif">
+                                    {{ t.points }}
+                                </td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+        }
+
+    }
+</div>
+
+<style>
+.stat-mini {
+    padding: 18px 12px; text-align: center; border-radius: 8px;
+}
+.stat-mini-val {
+    font-family: 'Space Grotesk', sans-serif;
+    font-size: 1.8rem; font-weight: 700; color: #fff; line-height: 1;
+}
+.stat-mini-lbl {
+    font-size: .62rem; color: var(--text-2);
+    letter-spacing: .1em; text-transform: uppercase; margin-top: 4px;
+}
+</style>

@@ -20,6 +20,7 @@ export class Bracket implements OnInit {
 
     todos   = signal<any[]>([]);
     loading = signal(true);
+    error   = signal(false);
     stages  = STAGES;
 
     porFase = computed(() => {
@@ -32,7 +33,7 @@ export class Bracket implements OnInit {
     ngOnInit() {
         this.fb.getPartidos().subscribe({
             next: r => { this.todos.set(r.matches ?? []); this.loading.set(false); },
-            error: () => this.loading.set(false),
+            error: () => { this.error.set(true); this.loading.set(false); },
         });
     }
 

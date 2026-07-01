@@ -6,6 +6,10 @@
 
     @if (loading()) {
         <div style="color:var(--text-3)">Cargando...</div>
+    } @else if (error()) {
+        <div class="glass p-5 text-center" style="color:var(--text-2)">
+            No se pudo cargar la información. Intenta más tarde.
+        </div>
     } @else if (porFase().length === 0) {
         <div class="glass p-5 text-center">
             <div style="font-size:3rem;opacity:.15;margin-bottom:1rem">⬡</div>
