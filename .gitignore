@@ -45,3 +45,5 @@ Thumbs.db
 
 # Proxy con API key real — no subir al repo
 proxy.conf.json
+.vercel
+.env*
