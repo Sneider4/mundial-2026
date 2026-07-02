@@ -1,4 +1,79 @@
-<div class="container-xl px-4 py-5">
+<!-- ══════════════════════════════════════════════════════════
+     HERO / LANDING
+══════════════════════════════════════════════════════════ -->
+<section class="hero">
+
+    <!-- Hexágonos decorativos flotantes -->
+    <div aria-hidden="true">
+        <span class="hx" style="--s:22rem;--x:-6%;--y:8%;--d:28s;--dd:-6s;--o:.022">⬡</span>
+        <span class="hx" style="--s:10rem;--x:72%;--y:4%;--d:18s;--dd:-2s;--o:.05">⬡</span>
+        <span class="hx" style="--s:16rem;--x:86%;--y:52%;--d:24s;--dd:-9s;--o:.025">⬡</span>
+        <span class="hx" style="--s:7rem; --x:52%;--y:82%;--d:20s;--dd:-14s;--o:.06">⬡</span>
+        <span class="hx" style="--s:26rem;--x:-4%;--y:58%;--d:34s;--dd:-4s;--o:.015">⬡</span>
+        <span class="hx" style="--s:5rem; --x:34%;--y:12%;--d:15s;--dd:-11s;--o:.07">⬡</span>
+        <span class="hx" style="--s:12rem;--x:58%;--y:38%;--d:22s;--dd:-7s;--o:.018">⬡</span>
+    </div>
+
+    <!-- Viñeta central que oscurece los bordes -->
+    <div class="hero-overlay" aria-hidden="true"></div>
+
+    <!-- Contenido central -->
+    <div class="hero-body">
+
+        <!-- Badge "en curso" -->
+        <div class="hero-badge">
+            <span class="hero-live-dot"></span>
+            <span>FIFA World Cup 2026 &nbsp;·&nbsp; En curso</span>
+        </div>
+
+        <!-- Símbolo -->
+        <div class="hero-symbol">⬡</div>
+
+        <!-- Título -->
+        <h1 class="hero-title">
+            Mundial<br><em>2026</em>
+        </h1>
+
+        <!-- Sedes -->
+        <p class="hero-sedes">
+            🇺🇸 Estados Unidos &nbsp;·&nbsp; 🇨🇦 Canadá &nbsp;·&nbsp; 🇲🇽 México
+        </p>
+
+        <!-- Stats rápidas en tiempo real -->
+        <div class="hero-stats">
+            <div class="hero-stat">
+                <span class="hs-val">48</span>
+                <span class="hs-lbl">Selecciones</span>
+            </div>
+            <div class="hs-div"></div>
+            <div class="hero-stat">
+                <span class="hs-val">{{ partidosJugados() || '—' }}</span>
+                <span class="hs-lbl">Partidos jugados</span>
+            </div>
+            <div class="hs-div"></div>
+            <div class="hero-stat">
+                <span class="hs-val">{{ totalGoles() || '—' }}</span>
+                <span class="hs-lbl">Goles marcados</span>
+            </div>
+        </div>
+
+        <!-- Botón scroll -->
+        <button class="hero-cta" (click)="scrollToContent()">
+            Ver estadísticas
+            <i class="bi bi-chevron-down hero-cta-icon"></i>
+        </button>
+
+    </div>
+
+    <!-- Línea divisoria inferior -->
+    <div class="hero-rule" aria-hidden="true"></div>
+</section>
+
+
+<!-- ══════════════════════════════════════════════════════════
+     CONTENIDO PRINCIPAL (KPIs, resultados, charts)
+══════════════════════════════════════════════════════════ -->
+<div id="home-content" class="container-xl px-4 py-5">
 
     <!-- KPI CARDS -->
     @if (!loading() && !error()) {
@@ -172,10 +247,165 @@
     }
 </div>
 
+
 <style>
+/* ─── HERO ───────────────────────────────────────────────── */
+.hero {
+    position: relative;
+    min-height: calc(100vh - 60px);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    overflow: hidden;
+    background:
+        radial-gradient(ellipse 80% 60% at 50% -10%, rgba(201,168,76,.09) 0%, transparent 65%),
+        radial-gradient(ellipse 55% 45% at 85% 85%,  rgba(201,168,76,.04) 0%, transparent 55%);
+}
+
+/* Floating decorative hexagons */
+.hx {
+    position: absolute;
+    left: var(--x); top: var(--y);
+    font-size: var(--s);
+    color: #c9a84c;
+    opacity: var(--o);
+    line-height: 1;
+    pointer-events: none;
+    user-select: none;
+    animation: hx-drift var(--d) ease-in-out infinite var(--dd);
+}
+@keyframes hx-drift {
+    0%,100% { transform: translateY(0)    rotate(0deg);  }
+    33%      { transform: translateY(-18px) rotate(4deg);  }
+    66%      { transform: translateY(12px)  rotate(-3deg); }
+}
+
+/* Centre vignette */
+.hero-overlay {
+    position: absolute; inset: 0; pointer-events: none;
+    background: radial-gradient(ellipse 75% 65% at 50% 50%, transparent 35%, rgba(7,9,13,.72) 100%);
+}
+
+/* Content */
+.hero-body {
+    position: relative; z-index: 2;
+    display: flex; flex-direction: column; align-items: center;
+    text-align: center; gap: 0;
+    padding: 48px 24px 80px;
+    max-width: 720px; width: 100%;
+}
+
+/* Status badge */
+.hero-badge {
+    display: inline-flex; align-items: center; gap: 8px;
+    padding: 5px 16px; border-radius: 100px;
+    border: 1px solid rgba(201,168,76,.22);
+    background: rgba(201,168,76,.05);
+    font-family: 'Space Grotesk', sans-serif;
+    font-size: .68rem; font-weight: 500;
+    color: rgba(201,168,76,.75); letter-spacing: .05em;
+    margin-bottom: 32px;
+}
+.hero-live-dot {
+    width: 6px; height: 6px; border-radius: 50%;
+    background: #22c55e; box-shadow: 0 0 8px #22c55e;
+    animation: live-pulse 2s ease-in-out infinite;
+}
+@keyframes live-pulse { 0%,100%{opacity:1} 50%{opacity:.3} }
+
+/* Main symbol */
+.hero-symbol {
+    font-size: 3.8rem; color: #c9a84c; line-height: 1;
+    margin-bottom: 10px;
+    animation: symbol-glow 3.5s ease-in-out infinite;
+}
+@keyframes symbol-glow {
+    0%,100% { filter: drop-shadow(0 0 14px rgba(201,168,76,.3)); }
+    50%      { filter: drop-shadow(0 0 36px rgba(201,168,76,.65)); }
+}
+
+/* Main title */
+.hero-title {
+    font-family: 'Space Grotesk', sans-serif;
+    font-size: clamp(3.8rem, 11vw, 7.5rem);
+    font-weight: 800; line-height: .95;
+    letter-spacing: -.04em; color: #fff;
+    margin: 0 0 4px; font-style: normal;
+    em {
+        font-style: normal;
+        background: linear-gradient(135deg, #b8860b 0%, #f0d080 45%, #c9a84c 100%);
+        -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+        background-clip: text;
+    }
+}
+
+/* Sedes */
+.hero-sedes {
+    font-size: .82rem; color: var(--text-2);
+    margin: 18px 0 40px; line-height: 1.6;
+}
+
+/* Stats strip */
+.hero-stats {
+    display: flex; align-items: center;
+    padding: 20px 32px; border-radius: 16px;
+    border: 1px solid rgba(201,168,76,.14);
+    background: rgba(7,9,13,.65);
+    backdrop-filter: blur(20px);
+    margin-bottom: 44px;
+    gap: 0;
+}
+.hero-stat {
+    display: flex; flex-direction: column;
+    align-items: center; gap: 5px;
+    padding: 0 26px;
+}
+.hs-val {
+    font-family: 'Space Grotesk', sans-serif;
+    font-size: 2.2rem; font-weight: 800;
+    color: #fff; line-height: 1;
+}
+.hs-lbl {
+    font-size: .6rem; color: var(--text-3);
+    text-transform: uppercase; letter-spacing: .1em;
+    white-space: nowrap;
+}
+.hs-div {
+    width: 1px; height: 40px;
+    background: rgba(255,255,255,.07);
+}
+
+/* Scroll CTA */
+.hero-cta {
+    display: inline-flex; align-items: center; gap: 8px;
+    padding: 12px 30px; border-radius: 100px;
+    border: 1px solid rgba(201,168,76,.3);
+    background: rgba(201,168,76,.07);
+    color: #c9a84c; font-size: .82rem; font-weight: 600;
+    letter-spacing: .04em; cursor: pointer;
+    font-family: 'Space Grotesk', sans-serif;
+    transition: background .2s, border-color .2s, transform .2s;
+    &:hover {
+        background: rgba(201,168,76,.14);
+        border-color: rgba(201,168,76,.5);
+        transform: translateY(-2px);
+    }
+}
+.hero-cta-icon { animation: icon-bounce 2.2s ease-in-out infinite; }
+@keyframes icon-bounce {
+    0%,100% { transform: translateY(0); }
+    50%      { transform: translateY(5px); }
+}
+
+/* Bottom rule */
+.hero-rule {
+    position: absolute; bottom: 0; left: 0; right: 0; height: 1px;
+    background: linear-gradient(90deg, transparent, rgba(201,168,76,.2), transparent);
+}
+
+/* ─── EXISTING STYLES (unchanged) ───────────────────────── */
 .mb-6 { margin-bottom: 3rem; }
 
-/* KPI */
 .kpi-card {
     padding: 22px 16px; text-align: center;
     display: flex; flex-direction: column; align-items: center; gap: 4px;
@@ -191,7 +421,6 @@
     letter-spacing: .1em; text-transform: uppercase; margin-top: 2px;
 }
 
-/* Match rows */
 .match-row {
     display: flex; align-items: center; gap: 12px;
     padding: 10px 14px; border-radius: 8px;
@@ -208,16 +437,22 @@
 }
 .match-group { font-size:.62rem; color:var(--text-3); min-width:40px; text-align:right; }
 
-/* Stats banner */
 .stats-banner {
     display: flex; align-items: center; justify-content: space-between; gap: 16px;
-    padding: 20px; border-radius: 10px; text-decoration: none;
-    cursor: pointer;
+    padding: 20px; border-radius: 10px; text-decoration: none; cursor: pointer;
     &:hover { border-color: var(--gold); background: rgba(201,168,76,.04); }
 }
 
 .ver-mas-link {
     font-size:.78rem; color:var(--gold); text-decoration:none;
     display:inline-flex; align-items:center; gap:4px; margin-top:16px;
+}
+
+/* Mobile */
+@media (max-width: 640px) {
+    .hero-stats { padding: 16px 12px; }
+    .hero-stat  { padding: 0 14px; }
+    .hs-val     { font-size: 1.6rem; }
+    .hs-lbl     { font-size: .55rem; }
 }
 </style>

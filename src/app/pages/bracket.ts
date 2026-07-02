@@ -5,7 +5,7 @@ import { FootballService } from '../services/football';
 const STAGE_ORDER = ['LAST_32', 'LAST_16', 'QUARTER_FINALS', 'SEMI_FINALS', 'FINAL'];
 
 const LABELS: Record<string, string> = {
-    LAST_32:        'Treintaidosavos',
+    LAST_32:        'Diesiseisavos',
     LAST_16:        'Octavos',
     QUARTER_FINALS: 'Cuartos',
     SEMI_FINALS:    'Semifinales',

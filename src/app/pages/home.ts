@@ -107,6 +107,10 @@ export class Home implements OnInit {
         });
     }
 
+    scrollToContent() {
+        document.getElementById('home-content')?.scrollIntoView({ behavior: 'smooth' });
+    }
+
     scoreLocal(m: any)    { return m.score?.fullTime?.home ?? m.score?.halfTime?.home ?? '-'; }
     scoreVisitante(m: any){ return m.score?.fullTime?.away ?? m.score?.halfTime?.away ?? '-'; }
     flagUrl(team: any)    { return team?.crest ?? ''; }
