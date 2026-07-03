@@ -17,6 +17,7 @@
                             <span class="group-sub">{{ g.table?.length }} equipos</span>
                         </div>
 
+                        <div class="table-scroll">
                         <table>
                             <thead>
                                 <tr>
@@ -57,6 +58,7 @@
                                 }
                             </tbody>
                         </table>
+                        </div>
                     </div>
                 </div>
             }
@@ -65,6 +67,7 @@
 </div>
 
 <style>
+.table-scroll { overflow-x:auto; }
 .group-header {
     display:flex; align-items:center; justify-content:space-between;
     padding:10px 14px;

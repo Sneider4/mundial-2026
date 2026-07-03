@@ -22,9 +22,35 @@
                     @if (equipo().founded) {
                         <span style="color:var(--text-3)">Fundado en {{ equipo().founded }}</span>
                     }
+                    @if (equipo().coach?.name) {
+                        <span style="color:var(--text-3)">DT: {{ equipo().coach.name }}</span>
+                    }
+                    @if (equipo().venue) {
+                        <span style="color:var(--text-3)">{{ equipo().venue }}</span>
+                    }
                 </div>
             </div>
         </div>
+
+        <!-- Plantilla -->
+        @if (plantilla().length > 0) {
+            <p class="section-label mb-3">Plantilla</p>
+            <div class="mb-5">
+                @for (grupo of plantilla(); track grupo.key) {
+                    <div class="mb-4">
+                        <p class="squad-group-lbl">{{ grupo.label }}</p>
+                        <div class="squad-grid">
+                            @for (j of grupo.jugadores; track j.id) {
+                                <div class="glass squad-card">
+                                    <span class="squad-name">{{ j.name }}</span>
+                                    <span class="squad-meta">{{ subLabel(j) }}</span>
+                                </div>
+                            }
+                        </div>
+                    </div>
+                }
+            </div>
+        }
 
         <!-- Partidos -->
         <p class="section-label mb-3">Partidos en el Mundial</p>
@@ -80,6 +106,7 @@
 <style>
 .equipo-header {
     display:flex; align-items:center; gap:24px; border-radius:12px;
+    flex-wrap:wrap;
 }
 .equipo-crest {
     width:72px; height:72px; object-fit:contain;
@@ -87,23 +114,52 @@
     flex-shrink:0;
 }
 
+.squad-group-lbl {
+    font-family:'Space Grotesk',sans-serif; font-size:.68rem; font-weight:700;
+    color:var(--gold); text-transform:uppercase; letter-spacing:.08em;
+    margin-bottom:10px;
+}
+.squad-grid {
+    display:grid; grid-template-columns:repeat(auto-fill, minmax(150px, 1fr)); gap:8px;
+}
+.squad-card {
+    padding:10px 12px; border-radius:8px;
+    display:flex; flex-direction:column; gap:3px; min-width:0;
+}
+.squad-name {
+    font-size:.82rem; font-weight:600; color:var(--text);
+    white-space:nowrap; overflow:hidden; text-overflow:ellipsis;
+}
+.squad-meta { font-size:.68rem; color:var(--text-3); }
+
 .eq-row {
     display:flex; align-items:center; gap:14px;
     padding:11px 16px; transition:background .15s;
 }
 .eq-row:hover { background:var(--surface-2); }
 
-.eq-date { font-size:.68rem; color:var(--text-3); min-width:42px; }
-.eq-res  { font-size:.72rem; font-weight:700; min-width:16px; text-align:center; }
+.eq-date { font-size:.68rem; color:var(--text-3); min-width:42px; flex-shrink:0; }
+.eq-res  { font-size:.72rem; font-weight:700; min-width:16px; text-align:center; flex-shrink:0; }
 
-.eq-team { display:flex; align-items:center; gap:8px; flex:1; }
+.eq-team { display:flex; align-items:center; gap:8px; flex:1; min-width:0; }
 .eq-team.right { justify-content:flex-end; }
-.eq-team span { font-size:.83rem; font-weight:500; }
+.eq-team span {
+    font-size:.83rem; font-weight:500;
+    white-space:nowrap; overflow:hidden; text-overflow:ellipsis; min-width:0;
+}
 
 .eq-score {
     font-family:'Space Grotesk',sans-serif; font-weight:700; font-size:1rem;
-    color:#fff; min-width:72px; text-align:center;
+    color:#fff; min-width:72px; text-align:center; flex-shrink:0;
     display:flex; align-items:center; justify-content:center;
 }
-.eq-stage { font-size:.62rem; color:var(--text-3); min-width:48px; text-align:right; }
+.eq-stage { font-size:.62rem; color:var(--text-3); min-width:48px; text-align:right; flex-shrink:0; }
+
+@media (max-width:480px) {
+    .equipo-crest { width:56px; height:56px; }
+    .eq-row { gap:8px; padding:10px 12px; }
+    .eq-date { min-width:32px; font-size:.6rem; }
+    .eq-score { min-width:54px; font-size:.88rem; }
+    .eq-stage { display:none; }
+}
 </style>

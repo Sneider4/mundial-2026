@@ -1,6 +1,6 @@
 <div class="container-xl px-4 py-5">
 
-    <div class="d-flex align-items-center justify-content-between mb-5 flex-wrap gap-3">
+    <div class="d-flex align-items-center justify-content-between mb-2 flex-wrap gap-3">
         <h1 class="section-title">Fixture</h1>
         <div class="d-flex gap-2 flex-wrap">
             @for (f of filtros; track f) {
@@ -13,6 +13,12 @@
             }
         </div>
     </div>
+
+    @if (ultimaActualizacion()) {
+        <div class="mb-5" style="font-size:.65rem;color:var(--text-3)">
+            Actualizado {{ ultimaActualizacion() | date:'HH:mm:ss' }} · cada 30s
+        </div>
+    }
 
     @if (loading()) {
         <div style="color:var(--text-3)">Cargando...</div>
@@ -75,18 +81,29 @@
 }
 .fixture-row:hover { background:var(--surface-2); }
 
-.fx-time { font-size:.7rem; color:var(--text-3); min-width:40px; }
-.fx-team { display:flex; align-items:center; gap:8px; flex:1; }
+.fx-time { font-size:.7rem; color:var(--text-3); min-width:40px; flex-shrink:0; }
+.fx-team { display:flex; align-items:center; gap:8px; flex:1; min-width:0; }
 .fx-team.right { justify-content:flex-end; }
-.fx-team span { font-size:.83rem; font-weight:500; }
+.fx-team span {
+    font-size:.83rem; font-weight:500;
+    white-space:nowrap; overflow:hidden; text-overflow:ellipsis; min-width:0;
+}
 
 .fx-score {
     font-family:'Space Grotesk',sans-serif; font-weight:700;
     font-size:1.05rem; color:#fff;
-    min-width:76px; text-align:center;
+    min-width:76px; text-align:center; flex-shrink:0;
     display:flex; align-items:center; justify-content:center;
 }
 .fx-sep { color:rgba(255,255,255,.2); font-size:.85rem; margin:0 5px; }
 .fx-vs { font-size:.72rem; color:var(--text-3); font-weight:400; }
-.fx-meta { display:flex; flex-direction:column; align-items:flex-end; gap:3px; min-width:56px; }
+.fx-meta { display:flex; flex-direction:column; align-items:flex-end; gap:3px; min-width:56px; flex-shrink:0; }
+
+@media (max-width:480px) {
+    .fixture-row { gap:8px; padding:10px 12px; }
+    .fx-time { min-width:30px; font-size:.62rem; }
+    .fx-score { min-width:58px; font-size:.92rem; }
+    .fx-meta { min-width:auto; }
+    .fx-meta span:last-child { display:none; }
+}
 </style>

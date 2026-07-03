@@ -1,9 +1,15 @@
-import { Component, OnInit, inject, signal, computed, viewChild, ElementRef, effect } from '@angular/core';
+import { Component, OnInit, inject, signal, computed, viewChild, ElementRef, effect, DestroyRef } from '@angular/core';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { CommonModule, DatePipe } from '@angular/common';
 import { RouterLink } from '@angular/router';
 import { FootballService } from '../services/football';
 import { Chart } from 'chart.js';
 import { darkTooltip, darkScalesX, darkScalesY } from '../utils/chart-setup';
+import { interval } from 'rxjs';
+import { startWith, switchMap } from 'rxjs/operators';
+
+const POLL_PARTIDOS_MS = 30_000;
+const POLL_GOLEADORES_MS = 60_000;
 
 @Component({
     selector: 'app-home',
@@ -12,6 +18,7 @@ import { darkTooltip, darkScalesX, darkScalesY } from '../utils/chart-setup';
 })
 export class Home implements OnInit {
     private fb = inject(FootballService);
+    private destroyRef = inject(DestroyRef);
 
     todosPartidos = signal<any[]>([]);
     enVivo        = signal<any[]>([]);
@@ -20,6 +27,7 @@ export class Home implements OnInit {
     goleadores    = signal<any[]>([]);
     loading       = signal(true);
     error         = signal(false);
+    ultimaActualizacion = signal<Date | null>(null);
 
     totalGoles = computed(() =>
         this.todosPartidos()
@@ -88,7 +96,11 @@ export class Home implements OnInit {
     }
 
     ngOnInit() {
-        this.fb.getPartidos().subscribe({
+        interval(POLL_PARTIDOS_MS).pipe(
+            startWith(0),
+            switchMap(() => this.fb.getPartidos()),
+            takeUntilDestroyed(this.destroyRef),
+        ).subscribe({
             next: r => {
                 const all: any[] = r.matches ?? [];
                 this.todosPartidos.set(all);
@@ -97,12 +109,17 @@ export class Home implements OnInit {
                 this.proximos.set(
                     all.filter(m => m.status === 'TIMED' || m.status === 'SCHEDULED').slice(0, 6)
                 );
+                this.ultimaActualizacion.set(new Date());
                 this.loading.set(false);
             },
             error: () => { this.error.set(true); this.loading.set(false); }
         });
 
-        this.fb.getGoleadores(8).subscribe({
+        interval(POLL_GOLEADORES_MS).pipe(
+            startWith(0),
+            switchMap(() => this.fb.getGoleadores(8)),
+            takeUntilDestroyed(this.destroyRef),
+        ).subscribe({
             next: r => this.goleadores.set(r.scorers ?? [])
         });
     }

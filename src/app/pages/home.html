@@ -117,7 +117,14 @@
     <!-- EN VIVO -->
     @if (enVivo().length > 0) {
         <div class="mb-6">
-            <p class="section-label mb-3"><span class="live-dot">En vivo</span></p>
+            <div class="d-flex align-items-center justify-content-between flex-wrap gap-2 mb-3">
+                <p class="section-label mb-0"><span class="live-dot">En vivo</span></p>
+                @if (ultimaActualizacion()) {
+                    <span style="font-size:.65rem;color:var(--text-3)">
+                        Actualizado {{ ultimaActualizacion() | date:'HH:mm:ss' }} · cada 30s
+                    </span>
+                }
+            </div>
             <div class="row g-3">
                 @for (m of enVivo(); track m.id) {
                     <div class="col-md-6 col-xl-4">
@@ -213,11 +220,11 @@
                                     {{ m.utcDate | date:'EEE d MMM · HH:mm' }}
                                 </div>
                                 <div class="d-flex align-items-center gap-2">
-                                    <img [src]="flagUrl(m.homeTeam)" class="flag">
-                                    <span style="font-size:.83rem;font-weight:500;flex:1">{{ m.homeTeam?.shortName }}</span>
-                                    <span style="font-size:.7rem;color:var(--text-3)">vs</span>
-                                    <span style="font-size:.83rem;font-weight:500;flex:1;text-align:right">{{ m.awayTeam?.shortName }}</span>
-                                    <img [src]="flagUrl(m.awayTeam)" class="flag">
+                                    <img [src]="flagUrl(m.homeTeam)" class="flag" style="flex-shrink:0">
+                                    <span class="proximo-team" style="font-size:.83rem;font-weight:500;flex:1">{{ m.homeTeam?.shortName }}</span>
+                                    <span style="font-size:.7rem;color:var(--text-3);flex-shrink:0">vs</span>
+                                    <span class="proximo-team" style="font-size:.83rem;font-weight:500;flex:1;text-align:right">{{ m.awayTeam?.shortName }}</span>
+                                    <img [src]="flagUrl(m.awayTeam)" class="flag" style="flex-shrink:0">
                                 </div>
                             </div>
                         }
@@ -426,16 +433,30 @@
     padding: 10px 14px; border-radius: 8px;
 }
 .match-row:hover { background: var(--surface-2); }
-.match-date { font-size:.68rem; color:var(--text-3); min-width:42px; }
-.match-team { display:flex; align-items:center; gap:8px; flex:1; }
+.match-date { font-size:.68rem; color:var(--text-3); min-width:42px; flex-shrink:0; }
+.match-team { display:flex; align-items:center; gap:8px; flex:1; min-width:0; }
 .match-team.right { justify-content:flex-end; }
-.match-team span { font-size:.83rem; font-weight:500; }
+.match-team span {
+    font-size:.83rem; font-weight:500;
+    white-space:nowrap; overflow:hidden; text-overflow:ellipsis; min-width:0;
+}
 .match-score {
     font-family:'Space Grotesk',sans-serif; font-weight:700; font-size:1rem;
-    color:#fff; min-width:72px; text-align:center;
+    color:#fff; min-width:72px; text-align:center; flex-shrink:0;
     display:flex; align-items:center; justify-content:center;
 }
-.match-group { font-size:.62rem; color:var(--text-3); min-width:40px; text-align:right; }
+.match-group { font-size:.62rem; color:var(--text-3); min-width:40px; text-align:right; flex-shrink:0; }
+
+.proximo-team {
+    white-space:nowrap; overflow:hidden; text-overflow:ellipsis; min-width:0;
+}
+
+@media (max-width:480px) {
+    .match-row { gap:8px; padding:8px 10px; }
+    .match-date { min-width:32px; font-size:.62rem; }
+    .match-score { min-width:56px; }
+    .match-group { display:none; }
+}
 
 .stats-banner {
     display: flex; align-items: center; justify-content: space-between; gap: 16px;

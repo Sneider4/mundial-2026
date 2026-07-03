@@ -1,6 +1,11 @@
-import { Component, OnInit, inject, signal, computed } from '@angular/core';
+import { Component, OnInit, inject, signal, computed, DestroyRef } from '@angular/core';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { CommonModule, DatePipe } from '@angular/common';
 import { FootballService } from '../services/football';
+import { interval } from 'rxjs';
+import { startWith, switchMap } from 'rxjs/operators';
+
+const POLL_PARTIDOS_MS = 30_000;
 
 @Component({
     selector: 'app-fixture',
@@ -9,10 +14,12 @@ import { FootballService } from '../services/football';
 })
 export class Fixture implements OnInit {
     private fb = inject(FootballService);
+    private destroyRef = inject(DestroyRef);
 
     todos   = signal<any[]>([]);
     filtro  = signal<string>('TODOS');
     loading = signal(true);
+    ultimaActualizacion = signal<Date | null>(null);
 
     filtros = ['TODOS', 'SCHEDULED', 'LIVE', 'FINISHED'];
 
@@ -32,8 +39,16 @@ export class Fixture implements OnInit {
     });
 
     ngOnInit() {
-        this.fb.getPartidos().subscribe({
-            next: r => { this.todos.set(r.matches ?? []); this.loading.set(false); },
+        interval(POLL_PARTIDOS_MS).pipe(
+            startWith(0),
+            switchMap(() => this.fb.getPartidos()),
+            takeUntilDestroyed(this.destroyRef),
+        ).subscribe({
+            next: r => {
+                this.todos.set(r.matches ?? []);
+                this.ultimaActualizacion.set(new Date());
+                this.loading.set(false);
+            },
             error: () => this.loading.set(false),
         });
     }
